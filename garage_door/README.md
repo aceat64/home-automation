@@ -29,3 +29,15 @@ WantedBy=multi-user.target
 4. `systemctl --system daemon-reload`
 5. `systemctl enable garage-door.service`
 6. `service garage-door start`
+
+## Home-Assisstant Config
+```
+garage_door:
+  platform: mqtt
+  name: "Garage Door"
+  state_topic: "home/garage_door"
+  command_topic: "home/garage_door/set"
+  optimistic: false
+  qos: 0
+  retain: true
+```
