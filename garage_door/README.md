@@ -22,6 +22,8 @@ After=network.target
 Type=simple
 User=root
 ExecStart=/usr/local/sbin/garage_door.py
+Restart=always
+RestartSec=15
 
 [Install]
 WantedBy=multi-user.target

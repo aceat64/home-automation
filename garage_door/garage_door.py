@@ -76,6 +76,8 @@ def on_message(client, userdata, msg):
         elif msg.payload == "open" or msg.payload == "close":
             print("Invalid door state for command, updating state")
             update_state(sensor)
+        elif msg.payload == "update":
+            update_state(sensor)
         elif msg.payload == "shutdown":
             shutdown = 1
         else:
