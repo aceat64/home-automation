@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -u
 import paho.mqtt.client as mqtt
 import RPi.GPIO as gpio
 import json, time, sys
@@ -102,6 +102,7 @@ update_state(last_state)
 
 try:
     while shutdown == 0:
+        time.sleep(0.1)
         sensor = gpio.input(sensorPin)
         if sensor != last_state:
             last_state = sensor
