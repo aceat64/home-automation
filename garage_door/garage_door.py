@@ -110,7 +110,7 @@ try:
             last_state = sensor
             update_state(sensor)
 except KeyboardInterrupt:
-    print "Shutdown requested"
+    print "\nShutdown requested"
 
 client.loop_stop()
 print("Good bye")
