@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1D232E">
+
+    <title>Tùs Nuadh Dashboard</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd">
+    <link rel="stylesheet" href="css/dashboard.css" integrity="sha384-GrMexBbJOc7SHtMq0t14spxi9NmyqyeDiJ/pn6W4nHS24asNnJUUgcmEa7Pb1ZpX">
+  </head>
+  <body>
+    <div class="container">
+      <div class="alert alert-danger hidden" role="alert">
+      </div>
+      <div class="row">
+        <div class="col-md-4 col-xl-3">
+          <div class="card">
+            <div class="card-block weather" data-toggle="modal" data-target="#wunderground-modal">
+              <div class="current">
+                <canvas id="weather-icon" width="82" height="82"></canvas>
+                <div class="temp">
+                  <span id="weather_temperature"></span>°
+                </div>
+                <div class="desc"><span id="weather_summary"></span> · Feels&nbsp;like&nbsp;<span id="weather_apparent_temperature"></span>°</div>
+              </div>
+
+              <dl>
+                <dt>NEXT HOUR</dt>
+                <dd id="weather_minutely_summary"></dd>
+                <dt>NEXT 24 HOURS</dt>
+                <dd id="weather_hourly_summary"></dd>
+                <dt>NEXT 7 DAYS</dt>
+                <dd id="weather_daily_summary"></dd>
+              </dl>
+            </div>
+          </div>
+          <div class="card">
+            <div id="map"></div>
+          </div>
+        </div>
+        <div class="col-md-8 col-xl-9">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card card-block">
+                <h4 class="card-title">Internet<small class="pull-xs-right"><span id="eth0_in"></span> / <span id="eth0_out"></span></small></h4>
+                <div id="eth0-graph" class="chart"></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card card-block">
+                <h4 class="card-title">Power<small class="pull-xs-right"><span id="power"></span></small></h4>
+                <div id="power-graph" class="chart"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="card">
+                <div class="card-block text-xs-center">
+                  <div class="nest-settings">
+                    <p id="nest_operation"></p>
+                    <p id="nest_target_temp"></p>
+                  </div>
+                  <p class="card-text">Currently <span id="nest_current_temp"></span></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="card">
+                <div class="card-block">
+                  <dl class="dl-horizontal">
+                    <dt class="col-lg-5 col-xl-4">Garage</dt>
+                    <dd class="col-lg-7 col-xl-8" id="garage_door"></dd>
+                    <dt class="col-lg-5 col-xl-4">Nexus 5X</dt>
+                    <dd class="col-lg-7 col-xl-8" id="nexus_5x"></dd>
+                    <dt class="col-lg-5 col-xl-4">Pixel XL</dt>
+                    <dd class="col-lg-7 col-xl-8" id="pixel_xl"></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="card">
+                <div class="card-block">
+                  <dl class="dl-horizontal">
+                    <dt class="col-lg-5 col-xl-4">Bitcoin</dt>
+                    <dd class="col-lg-7 col-xl-8" id="coinbase_price"></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="wunderground-modal" tabindex="-1" role="dialog" aria-labelledby="wundergroundModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <iframe id="wunderground" src=""></iframe>
+      </div>
+    </div>
+    <script src="js/tether.min.js" integrity="sha384-myzjMZGQ5U2YCFCbVDPVkY/pzLoGJM/8kItWns1RAft9stHOx/0SGPPQOv/KmQti"></script>
+    <script src="js/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx"></script>
+    <script src="js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7"></script>
+    <script src="js/jquery.flot.min.js" integrity="sha384-RwhSkUmEGeOAldfwpJck6gcmrGxI7Q8shFWFF5lqnOihJnV556qpqUVpYNP7wSew"></script>
+    <script src="js/jquery.flot.resize.min.js" integrity="sha384-k2ET2tu6wezuFh4wCXUO9WRZKXpUl2u2mCOIJhUi4YiPDFlO9iczGxrFwfVMHmwY"></script>
+    <script src="js/jquery.flot.threshold.multiple.js" integrity="sha384-LSalhArTlb5FG7gjpvi/bv+ZQ1lx4wA7bpajQEgPEeDVZ9PETb6mDCH8cbUtusDW"></script>
+    <script src="js/skycons.js" integrity="sha384-eNPstUIERzTji8MnImfGAvfQhKf+GeFfeibLyF0VNFp7oH96fEjTjT6xi018m4pM"></script>
+    <!-- UPDATE THE FILE THEN RECALCULATE HASH -->
+    <script src="js/dashboard.js" integrity="YOU WILL NEED TO RECALCULATE THIS"></script>
+    <!-- CHANGE TO YOUR API KEY -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE&callback=initMap"></script>
+  </body>
+</html>
