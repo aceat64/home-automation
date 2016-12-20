@@ -34,12 +34,14 @@ WantedBy=multi-user.target
 
 ## Home-Assisstant Config
 ```
-garage_door:
-  platform: mqtt
-  name: "Garage Door"
-  state_topic: "home/garage_door"
-  command_topic: "home/garage_door/set"
-  optimistic: false
-  qos: 0
-  retain: true
+switch:
+  - platform: mqtt
+    name: "Garage Door"
+    state_topic: "home/garage_door"
+    command_topic: "home/garage_door/set"
+    optimistic: false
+    qos: 0
+    retain: false
+    payload_on: "open"
+    payload_off: "closed"
 ```

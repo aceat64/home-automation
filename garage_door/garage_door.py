@@ -69,11 +69,11 @@ def on_message(client, userdata, msg):
             last_command = time.time()
             print("Opening garage door!")
             press_button()
-        elif msg.payload == "close" and sensor == 1:
+        elif msg.payload == "closed" and sensor == 1:
             last_command = time.time()
             print("Closing garage door!")
             press_button()
-        elif msg.payload == "open" or msg.payload == "close":
+        elif msg.payload == "open" or msg.payload == "closed":
             print("Invalid door state for command, updating state")
             update_state(sensor)
         elif msg.payload == "update":
@@ -85,7 +85,9 @@ def on_message(client, userdata, msg):
     else:
         print("Ignoring command, cooldown is still in effect")
 
-# Connect ot MQTT server and configure callbacks
+sensor = gpio.input(sensorPin)
+
+# Connect to MQTT server and configure callbacks
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
@@ -110,7 +112,7 @@ try:
             last_state = sensor
             update_state(sensor)
 except KeyboardInterrupt:
-    print "\nShutdown requested"
+    print "Shutdown requested"
 
 client.loop_stop()
 print("Good bye")
