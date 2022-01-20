@@ -1,8 +1,0 @@
-{
-  "name": "Home Dashboard",
-  "theme_color": "#1D232E",
-  "background_color": "#1D232E",
-  "start_url": "index.html",
-  "display": "standalone",
-  "orientation": "landscape"
-}
