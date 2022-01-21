@@ -30,8 +30,8 @@ python-versions = ">=3.6"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.8"
-content-hash = "9ae5f32f6079ec5a99030f2c0fac7f461874188c5cf2b708628848b2f6d11a4f"
+python-versions = "^3.10"
+content-hash = "5258007fc2438b98d94b707e69b622f59936aa97d3d67f4046d02c4e8bebdff5"
 
 [metadata.files]
 paho-mqtt = [
