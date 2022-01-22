@@ -101,16 +101,56 @@ Phase info in the example data is `\x0c` so this is a DC frame.
 
 ### DC Voltage
 
+2 byte, unsigned int, little endian
+
+```text
+\x92\x15 = 5522 / 100 = 55.2v
+```
+
+Using unpack: `unpack('<H', '\x92\x15')`
+
+`<` means little endian: https://docs.python.org/3/library/struct.html#byte-order-size-and-alignment
+
+`H` means short (2 byte int, unsigned): https://docs.python.org/3/library/struct.html#format-characters
+
 ### DC Current Used
+
+3 byte, unsigned int, little endian
+
+```text
+\x00\x00\x00 = 0 / 100 = 0.00A
+```
+
+Using unpack: `unpack('<I', '\x00\x00\x00' + '\x00)`
+
+We have to pad with another (empty byte) because `I` means 4 byte int (signed).
 
 ## DC Current Provided
 
+3 byte, unsigned int, little endian
+
+```text
+\x00\x00\x00 = 0 / 100 = 0.00A
+```
+
+Using unpack: `unpack('<I', '\x00\x00\x00' + '\x00)`
+
+We have to pad with another (empty byte) because `I` means 4 byte int (unsigned).
+
 ### Inverter Period
+
+1 byte, unsigned int, little endian
 
 ```text
 \x45 = 69
 (10 / 69) * 1000 = 144.92hz
 ```
+
+Using unpack: `unpack('<B', '\x45)`
+
+`B` means short (1 byte int, unsigned).
+
+I don't know why this shows such a high frequency, ~60Hz was expected, but this seems to return ~144Hz when the inverter is on and off.
 
 ## AC Frame
 
@@ -146,21 +186,74 @@ This is used to correctly calculate current later.
 
 ### State
 
+Value   | Meaning
+--------|---
+`\x00`  | Down
+`\x01`  | Startup
+`\x02`  | Off
+`\x03`  | Slave
+`\x04`  | InvertFull
+`\x05`  | InvertHalf
+`\x06`  | InvertAES
+`\x07`  | PowerAssist
+`\x08`  | Bypass
+`\x09`  | Charge
+
+State example is `\x09` so the state is "Charge".
+
 ### Phase Info (AC)
 
 The loopup table is the same as for DC frames. Phase info in the example data is `\x08` so this is an AC frame that describes L1 and there is only 1 phase in the system.
 
 ### Mains Voltage
 
+2 byte, unsigned int, little endian
+
+```text
+\xdf\x00 =  223 / 100 = 2.23A
+```
+
+Using unpack: `unpack('<H', '\xdf\x00')`
+
 ### Mains Current
+
+2 byte, unsigned int, little endian
+
+```text
+\x1d\x60 =  24605 / 100 = 246.05v
+```
+
+Using unpack: `unpack('<H', '\x1d\x60')`
 
 ### Inverter Voltage
 
+2 byte, unsigned int, little endian
+
+```text
+\x1d\x60 =  24605 / 100 = 246.05v
+```
+
+Using unpack: `unpack('<H', '\x1d\x60')`
+
 ### Inverter Current
 
+2 byte, unsigned int, little endian
+
+```text
+\xaf\x00 =  175 / 100 = 1.75A
+```
+
+Using unpack: `unpack('<H', '\xaf\x00')`
+
 ### Mains Period
+
+1 byte, unsigned int, little endian
 
 ```text
 \xa2 = 162
 (10 / 162) * 1000 = 61.72hz
 ```
+
+Using unpack: `unpack('<B', '\x45)`
+
+`B` means short (1 byte int, unsigned).

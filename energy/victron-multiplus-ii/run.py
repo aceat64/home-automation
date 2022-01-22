@@ -90,9 +90,9 @@ def getInfo(port):
   dc_frame = readFrame()
   if not dc_frame:
     return False
-  info['dc']['voltage'] = unpack('<h', dc_frame[7:9])[0] / 100
-  info['dc']['current_used'] = unpack('<i', dc_frame[9:12] + bytes([0x00]))[0] / 100
-  info['dc']['current_charge'] = unpack('<i', dc_frame[12:15] + bytes([0x00]))[0] / 100
+  info['dc']['voltage'] = unpack('<H', dc_frame[7:9])[0] / 100
+  info['dc']['current_used'] = unpack('<I', dc_frame[9:12] + bytes([0x00]))[0] / 100
+  info['dc']['current_charge'] = unpack('<I', dc_frame[12:15] + bytes([0x00]))[0] / 100
   info['dc']['inverter_freq'] = round((10 / unpack('<B', dc_frame[15:16])[0]) * 1000, 2)
 
   port.write(buildFrame('F', '\x01')) # get AC info
