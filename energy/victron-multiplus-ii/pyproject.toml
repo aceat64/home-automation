@@ -6,6 +6,9 @@ authors = ["Andrew LeCody <andrew@beyondweb.net>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+PyYAML = "^6.0"
+pyserial = "^3.5"
+paho-mqtt = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
 
