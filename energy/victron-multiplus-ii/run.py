@@ -26,15 +26,15 @@ def readFrame():
   frame = length_byte + message
   if sum([byte for byte in frame]) % 256 == 0:
     return(frame)
-  logging.warning("Unable to read data from inverter")
   return False
 
 
 def getInfo(port):
+  # Ask for version so the multiplus stops sending gratuitious version messages for a bit
   port.write(buildFrame('V')) # get version
+  time.sleep(0.5)
+  # toss the response(s), we don't care about them
   port.reset_input_buffer()
-  if not readFrame():
-    return False
 
   info = {
     'led': {
@@ -46,7 +46,6 @@ def getInfo(port):
   }
 
   port.write(buildFrame('L')) # get LEDs
-  port.reset_input_buffer()
   led_frame = readFrame()
   if not led_frame:
     return False
@@ -88,7 +87,6 @@ def getInfo(port):
     info['led']['blink'].append("Temperature")
 
   port.write(buildFrame('F', '\x00')) # get DC info
-  port.reset_input_buffer()
   dc_frame = readFrame()
   if not dc_frame:
     return False
@@ -98,7 +96,6 @@ def getInfo(port):
   info['dc']['inverter_freq'] = round((10 / unpack('<B', dc_frame[15:16])[0]) * 1000, 2)
 
   port.write(buildFrame('F', '\x01')) # get AC info
-  port.reset_input_buffer()
   ac_frame = readFrame()
   if not ac_frame:
     return False
@@ -159,9 +156,6 @@ def setup(client, config_file):
     logging.debug(f"Data: {json.dumps(sensor)}")
   return config
 
-# The callback for when the client receives a CONNACK response from the server.
-def mqtt_on_connect(client, userdata, rc):
-  logging.info(f"Connected with result code {rc}")
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
@@ -197,19 +191,25 @@ if __name__ == '__main__':
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client()
-  client.on_connect = mqtt_on_connect
   client.username_pw_set(os.environ['MQTT_USER'], os.environ['MQTT_PASS'])
   client.connect(os.environ['MQTT_SERVER'], int(os.environ['MQTT_PORT']))
 
   config = setup(client, args.config)
 
   try:
+    read_success = False
     while True:
       info = getInfo(port)
-      logging.debug(f"Got info: {info}")
       if info:
+        if not read_success:
+          logging.info("Successful read from inverter")
+          read_success = True
+        logging.debug(f"Got info: {info}")
         client.publish(f"homeassistant/sensor/{config['inverter']['name']}/state",
         json.dumps(info), 0, False)
+      else:
+        logging.warning("Unable to read data from inverter")
+        read_success = False
       logging.debug(f"Sleeping {args.interval}s")
       time.sleep(args.interval)
   except KeyboardInterrupt:

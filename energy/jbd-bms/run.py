@@ -12,14 +12,11 @@ import paho.mqtt.client as mqtt
 
 def getInfo(port):
   try:
-    logging.debug("Reading from BMS")
     bms = jbd.JBD(port, timeout=10)
     info = bms.readBasicInfo() | bms.readCellInfo()
-    logging.debug(f"Data from BMS: {json.dumps(info)}")
     return info
   except:
-    logging.warning('Failed to read from BMS')
-  return False
+    return False
 
 
 def setup(client, config_file):
@@ -54,9 +51,6 @@ def setup(client, config_file):
     logging.debug(f"Data: {json.dumps(sensor)}")
   return config
 
-# The callback for when the client receives a CONNACK response from the server.
-def mqtt_on_connect(client, userdata, rc):
-  logging.info(f"Connected with result code {rc}")
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
@@ -92,18 +86,25 @@ if __name__ == '__main__':
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client()
-  client.on_connect = mqtt_on_connect
   client.username_pw_set(os.environ['MQTT_USER'], os.environ['MQTT_PASS'])
   client.connect(os.environ['MQTT_SERVER'], int(os.environ['MQTT_PORT']))
 
   config = setup(client, args.config)
 
   try:
+    read_success = False
     while True:
       info = getInfo(port)
       if info:
+        if not read_success:
+          logging.info("Successful read from BMS")
+          read_success = True
+        logging.debug(f"Got info: {info}")
         client.publish(f"homeassistant/sensor/{config['pack']['name']}/state",
         json.dumps(info), 0, False)
+      else:
+        logging.warning('Failed to read from BMS')
+        read_success = False
       logging.debug("Sleeping {args.interval}s")
       time.sleep(args.interval)
   except KeyboardInterrupt:
