@@ -162,15 +162,15 @@ if __name__ == '__main__':
     description="Reads from a Victron MultiPlus-II and sends the data to Home Assistant.")
   parser.add_argument(
     '-p', '--port',
-    default='/dev/ttyUSB0',
+    default=os.getenv('PORT', '/dev/ttyUSB0'),
     help='Serial port to use')
   parser.add_argument(
     '-c', '--config',
-    default=os.path.join(sys.path[0], 'config.yml'),
+    default=os.getenv('CONFIG', os.path.join(sys.path[0], 'config.yml')),
     help='Sensor configuration file')
   parser.add_argument(
     '-i', '--interval',
-    default=10,
+    default=int(os.getenv('INTERVAL', 10)),
     help='Update interval')
   parser.add_argument(
     '-v', '--verbose',
@@ -179,7 +179,7 @@ if __name__ == '__main__':
   )
   args = parser.parse_args()
 
-  if args.verbose:
+  if args.verbose or os.getenv('VERBOSE'):
     loglevel = logging.DEBUG
   else:
     loglevel = logging.INFO
@@ -191,8 +191,8 @@ if __name__ == '__main__':
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client()
-  client.username_pw_set(os.environ['MQTT_USER'], os.environ['MQTT_PASS'])
-  client.connect(os.environ['MQTT_SERVER'], int(os.environ['MQTT_PORT']))
+  client.username_pw_set(os.getenv('MQTT_USER'), os.getenv('MQTT_PASS'))
+  client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 1883)))
 
   config = setup(client, args.config)
 

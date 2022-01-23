@@ -3,6 +3,7 @@ name = "victron-multiplus-ii"
 version = "0.1.0"
 description = ""
 authors = ["Andrew LeCody <andrew@beyondweb.net>"]
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
