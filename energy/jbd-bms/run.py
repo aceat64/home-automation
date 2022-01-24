@@ -119,15 +119,15 @@ def getInfo(port):
   return info
 
 
-def setup(client, config_file):
-  logging.info(f"Loading pack config file: {config_file}")
-  with open(config_file, "r", encoding="utf8") as yaml_file:
-    config = yaml.safe_load(yaml_file)
-  logging.info(f"Pack Name: {config['pack']['name']}")
-
+def setup(client, config):
   for sensor in config['sensor']:
     # make the sensor name safe for use in the mqtt path
     sensor_path_name = sensor['name'].replace(' ','_').lower()
+
+    if 'binary_sensor' in sensor and sensor['binary_sensor']:
+      component = "binary_sensor"
+    else:
+      component = "sensor"
 
     # add device so all sensors will be grouped together in hass
     sensor['device'] = {
@@ -137,19 +137,15 @@ def setup(client, config_file):
       'manufacturer': "JBD"
     }
     sensor['state_topic'] = f"homeassistant/sensor/{config['pack']['name']}/state"
+    sensor['availability_topic'] = f"homeassistant/sensor/{config['pack']['name']}/status"
     sensor['unique_id'] = f"{config['pack']['name']}_{sensor_path_name}"
-
-    if 'binary_sensor' in sensor and sensor['binary_sensor']:
-      component = "binary_sensor"
-    else:
-      component = "sensor"
 
     client.publish(
       f"homeassistant/{component}/{config['pack']['name']}/{sensor_path_name}/config",
       json.dumps(sensor), 0, True)
     logging.debug(f"Topic: homeassistant/{component}/{config['pack']['name']}/{sensor_path_name}/config")
     logging.debug(f"Data: {json.dumps(sensor)}")
-  return config
+  return True
 
 
 if __name__ == '__main__':
@@ -185,15 +181,21 @@ if __name__ == '__main__':
 
   logging.basicConfig(format="%(levelname)s: %(message)s", level=loglevel)
 
+  logging.info(f"Loading pack config file: {args.config}")
+  with open(args.config, "r", encoding="utf8") as yaml_file:
+    config = yaml.safe_load(yaml_file)
+  logging.info(f"Pack Name: {config['pack']['name']}")
+
   logging.info(f"Using port: {args.port}")
   port = serial.Serial(args.port, timeout = args.timeout)
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client()
+  client.will_set(f"homeassistant/sensor/{config['pack']['name']}/status", 'offline', 0, True)
   client.username_pw_set(os.getenv('MQTT_USER'), os.getenv('MQTT_PASS'))
   client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 1883)))
 
-  config = setup(client, args.config)
+  setup(client, config)
 
   try:
     read_success = False
@@ -203,9 +205,10 @@ if __name__ == '__main__':
         if not read_success:
           logging.info("Successful read from BMS")
           read_success = True
+          client.publish(f"homeassistant/sensor/{config['pack']['name']}/status", 'online', 0, True)
         logging.debug(f"Got info: {info}")
         client.publish(f"homeassistant/sensor/{config['pack']['name']}/state",
-        json.dumps(info), 0, False)
+        json.dumps(info), 0, True)
       else:
         logging.warning('Failed to read from BMS')
         read_success = False
