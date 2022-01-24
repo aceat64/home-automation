@@ -6,17 +6,117 @@ import time
 import json
 import serial
 import yaml
-import jbd
 import paho.mqtt.client as mqtt
+from struct import *
+
+
+def buildFrame(address, data = []):
+  payload = [ord(address), len(data)] + data
+  checksum = calcChecksum(payload)
+  return bytes(b'\xdd\xa5' + bytes(payload) + checksum + b'\x77')
+
+
+def readFrame():
+  frame = port.read_until('\x77')
+  if not frame:
+    return False
+  if frame[0] != ord(b'\xdd'):
+    logging.debug("Not the start of a frame")
+    return False
+  payload = frame[2:-3]
+  checksum = frame[-3:-1]
+  if calcChecksum(payload) != checksum:
+    logging.debug("Invalid checksum")
+    return False
+  return payload
+
+
+def calcChecksum(data):
+  return pack('>H', 65536 - sum(data))
 
 
 def getInfo(port):
-  try:
-    bms = jbd.JBD(port, timeout=10)
-    info = bms.readBasicInfo() | bms.readCellInfo()
-    return info
-  except:
+  port.write(buildFrame(b'\x03'))
+  frame = readFrame()
+  if not frame:
+    logging.debug("Not a valid frame")
     return False
+
+  values = unpack('>BxHhHHHxxHxxHxBBBB', frame[0:25])
+  if values[0] != 0:
+    # status is not ok!
+    logging.debug("Frame status not ok")
+    return False
+
+  info = {
+    'pack_mv': values[1],
+    'pack_ma': values[2],
+    'cur_cap': values[3],
+    'full_cap': values[4],
+    'cycle_cnt': values[5],
+    'cap_pct': values[8],
+    'cell_cnt': values[10]
+  }
+
+  ntc_cnt = values[11]
+  ntc_values = unpack(f'>{ntc_cnt}h', frame[25:25 + (ntc_cnt * 2)])
+  for i in range(ntc_cnt):
+    info[f'ntc{i}'] = (ntc_values[i] - 2731.5) / 10 # convert from K to C
+
+  if values[9] & 1:
+    info['chg_fet_en'] = True
+  else:
+    info['chg_fet_en'] = False
+  if values[9] & 2:
+    info['dsg_fet_en'] = True
+  else:
+    info['dsg_fet_en'] = False
+
+  balance = values[6]
+
+  for i in range(16):
+    if balance & 1:
+      info[f'bal{i}'] = True
+    else:
+      info[f'bal{i}'] = False
+    balance >>= 1
+
+  errors = values[7]
+  error_names = [
+    'covp_err',
+    'cuvp_err',
+    'povp_err',
+    'puvp_err',
+    'chgot_err',
+    'chgut_err',
+    'dsgot_err',
+    'dsgut_err',
+    'chgoc_err',
+    'dsgoc_err',
+    'sc_err',
+    'afe_err'
+  ]
+
+  for error_name in error_names:
+    if errors & 1:
+      info[error_name] = True
+    else:
+      info[error_name] = False
+    errors >>= 1
+
+  port.write(buildFrame(b'\x04'))
+  frame = readFrame()
+  if not frame:
+    logging.debug("Not a valid frame")
+    return False
+  cell_values = unpack(f">Bx{info['cell_cnt']}H", frame)
+  if cell_values[0] != 0:
+    logging.debug("Frame status not ok")
+    return False
+  for i in range(16):
+    info[f"cell{i}_mv"] = cell_values[i + 1]  # Up by 1 because the first entry is the status byte
+
+  return info
 
 
 def setup(client, config_file):
@@ -68,6 +168,10 @@ if __name__ == '__main__':
     default=int(os.getenv('INTERVAL', 10)),
     help='Update interval')
   parser.add_argument(
+    '-t', '--timeout',
+    default=int(os.getenv('TIMEOUT', 2)),
+    help='Serial read timeout')
+  parser.add_argument(
     '-v', '--verbose',
     help='Verbose logging',
     action='store_true'
@@ -82,7 +186,7 @@ if __name__ == '__main__':
   logging.basicConfig(format="%(levelname)s: %(message)s", level=loglevel)
 
   logging.info(f"Using port: {args.port}")
-  port = serial.Serial(args.port)
+  port = serial.Serial(args.port, timeout = args.timeout)
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client()

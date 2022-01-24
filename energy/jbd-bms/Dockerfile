@@ -18,6 +18,5 @@ RUN poetry install --no-dev
 
 COPY run.py /app
 COPY config.yml /app
-COPY jbd /app
 
 ENTRYPOINT ["python", "run.py"]

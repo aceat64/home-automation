@@ -5,22 +5,22 @@ sensor:
     device_class: voltage
     unit_of_measurement: V
     icon: mdi:current-dc
-    value_template: "{{ (value_json.pack_mv / 1000) | round(2) }}"
+    value_template: "{{ (value_json.pack_mv / 100) | round(2) }}"
   - name: Pack Current
     device_class: current
     unit_of_measurement: A
     icon: mdi:current-dc
-    value_template: "{{ (value_json.pack_ma / 1000) | round(2) }}"
+    value_template: "{{ (value_json.pack_ma / 100) | round(2) }}"
   - name: Pack Capacity Remaining
     device_class: energy
     unit_of_measurement: Wh
     icon: mdi:battery-high
-    value_template: "{{ ((value_json.cur_cap / 1000) * 51.2) | round(0) }}"
+    value_template: "{{ ((value_json.cur_cap / 100) * 51.2) | round(0) }}"
   - name: Pack Capacity Total
     device_class: energy
     unit_of_measurement: Wh
     icon: mdi:battery
-    value_template: "{{ ((value_json.full_cap / 1000) * 51.2) | round(0) }}"
+    value_template: "{{ ((value_json.full_cap / 100) * 51.2) | round(0) }}"
   - name: Pack Cycle Count
     icon: mdi:counter
     value_template: "{{ value_json.cycle_cnt }}"
