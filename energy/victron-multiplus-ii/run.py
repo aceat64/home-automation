@@ -11,22 +11,62 @@ from struct import *
 
 
 def buildFrame(command, data=''):
-  frame = [0xFF]
+  frame = [255]
   frame.extend(map(ord, command))
   frame.extend(map(ord, data))
   frame.insert(0, len(frame))
-  frame.append(256 - sum(frame) % 256)
-  return bytes(frame)
+  return bytes(frame) + calcChecksum(frame)
 
 
 def readFrame():
-  length_byte = port.read(1)
-  length = ord(length_byte)
-  message = port.read(length + 1)
-  frame = length_byte + message
-  if sum([byte for byte in frame]) % 256 == 0:
-    return(frame)
+  length = port.read(1)
+  frame = length + port.read(ord(length) + 1)
+  payload = frame[0:-1]
+  checksum = frame[-1:]
+  if calcChecksum(payload) == checksum:
+    return payload[1:]
   return False
+
+
+def calcChecksum(data):
+  return pack('B', 256 - sum(data) % 256)
+
+
+def getRamVarInfo(id):
+  port.write(buildFrame('W', f'\x36{id}\x00'))
+  res = readFrame()
+  if len(res) < 4:
+    # This RamVar is not supported
+    return False
+  info = {}
+  info['sc'], info['offset'] = unpack('<hh', res[3:7])
+  if info['sc'] < 0:
+    info['read_format'] = '<h'
+  else:
+    info['read_format'] = '<H'
+  info['scale'] = abs(info['sc'])
+  if info['scale'] >= 0x4000:
+    info['scale'] = 1 / (0x8000 - info['scale'])
+  return info
+
+def getRamVar(id):
+  info = getRamVarInfo(id)
+  if not info:
+    return False
+  port.write(buildFrame('W', f'\x30{id}'))
+  res = readFrame()
+  raw_value = unpack(info['read_format'], res[3:5])[0]
+  if abs(info['offset']) == 0x8000:
+    # this is a single bit value
+    if raw_value & (info['sc'] - 1):
+      return True
+    return False
+  return info['scale'] * (raw_value + info['offset'])
+
+
+def calcValue(id, value):
+  info = getRamVarInfo(id)
+  return info['scale'] * (value + info['offset'])
 
 
 def getInfo(port):
@@ -49,8 +89,8 @@ def getInfo(port):
   led_frame = readFrame()
   if not led_frame:
     return False
-  leds_on = ord(led_frame[3:4])
-  leds_blink = ord(led_frame[4:5])
+  leds_on = ord(led_frame[2:3])
+  leds_blink = ord(led_frame[3:4])
 
   if leds_on & 1:
     info['led']['on'].append("Mains")
@@ -90,16 +130,24 @@ def getInfo(port):
   dc_frame = readFrame()
   if not dc_frame:
     return False
-  info['dc']['voltage'] = unpack('<H', dc_frame[7:9])[0] / 100
-  info['dc']['current_used'] = unpack('<I', dc_frame[9:12] + bytes([0x00]))[0] / 100
-  info['dc']['current_charge'] = unpack('<I', dc_frame[12:15] + bytes([0x00]))[0] / 100
-  info['dc']['inverter_freq'] = round((10 / unpack('<B', dc_frame[15:16])[0]) * 1000, 2)
+  info['dc']['voltage'] = calcValue('\x04', unpack('<H', dc_frame[6:8])[0])
+  info['dc']['current_used'] = round(calcValue('\x05', unpack('<I', dc_frame[8:11] + bytes([0x00]))[0]), 2)
+  info['dc']['current_charge'] = round(calcValue('\x05', unpack('<I', dc_frame[11:14] + bytes([0x00]))[0]), 2)
+  info['dc']['inverter_freq'] = round(10 / calcValue('\x07', unpack('<B', dc_frame[14:15])[0]), 2)
 
   port.write(buildFrame('F', '\x01')) # get AC info
   ac_frame = readFrame()
   if not ac_frame:
     return False
-  state = [
+  ac_info = unpack('<BBxBxHHHHB', ac_frame[1:15])
+  info['ac'] = {
+    'mains_voltage': calcValue('\x00', ac_info[3]),
+    'mains_current': round(calcValue('\x01', ac_info[4]) * ac_info[0], 2),
+    'inverter_voltage': calcValue('\x02', ac_info[5]),
+    'inverter_current': round(calcValue('\x03', ac_info[6]) * ac_info[1], 2),
+    'mains_freq': round(10 / calcValue('\x08', ac_info[7]), 2)
+  }
+  state_defs = [
     "Down",
     "Startup",
     "Off",
@@ -109,17 +157,26 @@ def getInfo(port):
     "Inverting AES",
     "Power Assist",
     "Bypass",
-    "Charging"
+    "Charge"
   ]
-  ac_info = unpack('<BBxBxHHHHB', ac_frame[2:16])
-  info['ac'] = {
-    'state': state[ac_info[2]],
-    'mains_voltage': ac_info[3] / 100,
-    'mains_current': (ac_info[4] * ac_info[0]) / 100,
-    'inverter_voltage': ac_info[5] / 100,
-    'inverter_current': (ac_info[6] * ac_info[1]) / 100,
-    'mains_freq': round((10 / ac_info[7]) * 1000, 2)
-  }
+  sub_state_defs = [
+    "Charge Init",
+    "Charge Bulk",
+    "Charge Absorption",
+    "Charge Float",
+    "Charge Storage",
+    "Charge Repeated Absorption",
+    "Charge Forced Absorption",
+    "Charge Equalize",
+    "Charge Bulk Stopped",
+  ]
+  port.write(buildFrame('W', f'\x0e\x00'))
+  res = readFrame()
+  state, sub_state = unpack('>BB', res[3:5])
+  if state == 9:
+    info['ac']['state'] = sub_state_defs[sub_state]
+  else:
+    info['ac']['state'] = state_defs[state]
 
   return info
 

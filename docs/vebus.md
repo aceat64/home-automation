@@ -20,6 +20,11 @@ Sourced from (Victron Energy)[https://www.victronenergy.com/support-and-download
   * `buildFrame('F', '\x01')`
   * Request: `\x03\xff\x46\x01\xb7`
   * Response: `\x0f\x20\x01\x01\x01\x09\x08\x1d\x60\xdf\x00\x1d\x60\xaf\x00\xa2\x93`
+* Get Scale and Offset
+  * DC Voltage
+    * `buildFrame('W', '\x36\x04\x00')`
+    * Request: `\x05\xff\x57\x36\x04\x00\x6b`
+    * Response: `\x07\xff\x57\x8e\x9c\x7f\x00\x00\xfa`
 
 ## LED Frame
 
@@ -259,3 +264,29 @@ Using unpack: `unpack('<H', '\xaf\x00')`
 Using unpack: `unpack('<B', '\x45)`
 
 `B` means short (1 byte int, unsigned).
+
+## WinMon Commands
+
+### CommandGetRAMVarInfo
+Data   | Meaning
+-------|---
+`\x05` | length
+`\xff` | padding
+`\x57` | command 'W'
+`\x36` | CommandGetRAMVarInfo
+`\x04` | ram variable id
+`\x00` | padding
+`\x6b` | checksum
+
+#### Response
+Data   | Meaning
+-------|---
+`\x07` | length
+`\xff` | padding
+`\x57` | command 'W'
+`\x8e` | CommandGetRAMVarInfo
+`\x9c` | Sc
+`\x7f` | Sc
+`\x00` | Offset
+`\x00` | Offset
+`\xfa` | checksum
