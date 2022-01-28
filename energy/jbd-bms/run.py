@@ -148,6 +148,10 @@ def setup(client, config):
   return True
 
 
+def on_connect(client, userdata, flags, rc):
+  logging.info("Connected to MQTT broker")
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description="Reads from a JBD BMS and sends the data to Home Assistant.")
@@ -191,9 +195,13 @@ if __name__ == '__main__':
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client()
+  client.on_connect = on_connect
+  # Use TLS, but wrong
+  client.tls_set(cert_reqs=ssl.CERT_NONE)
+  client.tls_insecure_set(True)
   client.will_set(f"homeassistant/sensor/{config['pack']['name']}/status", 'offline', 0, True)
   client.username_pw_set(os.getenv('MQTT_USER'), os.getenv('MQTT_PASS'))
-  client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 1883)))
+  client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 8884)))
 
   setup(client, config)
 
