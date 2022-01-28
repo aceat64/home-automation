@@ -211,9 +211,6 @@ def setup(client, config):
   return True
 
 
-def on_connect(client, userdata, flags, rc):
-  logging.info("Connected to MQTT broker")
-
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description="Reads from a Victron MultiPlus-II and sends the data to Home Assistant.")
@@ -253,7 +250,6 @@ if __name__ == '__main__':
 
   logging.info("Connecting to MQTT broker")
   client = mqtt.Client(transport="websockets")
-  client.on_connect = on_connect
   # Use TLS, but wrong
   client.tls_set(cert_reqs=ssl.CERT_NONE)
   client.tls_insecure_set(True)
@@ -265,16 +261,21 @@ if __name__ == '__main__':
 
   try:
     read_success = False
+    count = 0
     while True:
       info = getInfo(port)
       if info:
         if not read_success:
           logging.info("Successful read from inverter")
           read_success = True
-          client.publish(f"homeassistant/sensor/{config['inverter']['name']}/status", 'online', 0, False)
+          if client.publish(f"homeassistant/sensor/{config['inverter']['name']}/status", 'online', 0, False):
+            logging.info("Updated device status to 'online'")
         logging.debug(f"Got info: {info}")
         client.publish(f"homeassistant/sensor/{config['inverter']['name']}/state",
         json.dumps(info), 0, False)
+        count += 1
+        if (count % 10 == 0):
+          logging.info(f"Sent {count} updates")
       else:
         logging.warning("Unable to read data from inverter")
         read_success = False
