@@ -191,7 +191,7 @@ if __name__ == '__main__':
   port = serial.Serial(args.port, timeout = args.timeout)
 
   logging.info("Connecting to MQTT broker")
-  client = mqtt.Client()
+  client = mqtt.Client(transport="websockets")
   # Use TLS, but wrong
   client.tls_set(cert_reqs=ssl.CERT_NONE)
   client.tls_insecure_set(True)
