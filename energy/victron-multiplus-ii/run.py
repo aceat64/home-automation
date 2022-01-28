@@ -249,13 +249,13 @@ if __name__ == '__main__':
   port = serial.Serial(args.port, 2400)
 
   logging.info("Connecting to MQTT broker")
-  client = mqtt.Client(transport="websockets")
+  client = mqtt.Client()
   # Use TLS, but wrong
   client.tls_set(cert_reqs=ssl.CERT_NONE)
   client.tls_insecure_set(True)
   client.will_set(f"homeassistant/sensor/{config['inverter']['name']}/status", 'offline', 0, True)
   client.username_pw_set(os.getenv('MQTT_USER'), os.getenv('MQTT_PASS'))
-  client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 8884)))
+  client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 8883)))
 
   setup(client, config)
 
