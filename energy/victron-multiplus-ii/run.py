@@ -263,10 +263,10 @@ if __name__ == '__main__':
         if not read_success:
           logging.info("Successful read from inverter")
           read_success = True
-          client.publish(f"homeassistant/sensor/{config['inverter']['name']}/status", 'online', 0, True)
+          client.publish(f"homeassistant/sensor/{config['inverter']['name']}/status", 'online', 0, False)
         logging.debug(f"Got info: {info}")
         client.publish(f"homeassistant/sensor/{config['inverter']['name']}/state",
-        json.dumps(info), 0, True)
+        json.dumps(info), 0, False)
       else:
         logging.warning("Unable to read data from inverter")
         read_success = False
