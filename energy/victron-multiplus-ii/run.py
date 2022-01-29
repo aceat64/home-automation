@@ -22,10 +22,14 @@ def buildFrame(command, data=''):
 def readFrame():
   length = port.read(1)
   frame = length + port.read(ord(length) + 1)
+  if len(frame) != ord(length) + 2:
+    logging.warning("Frame shorter than expected")
+    return False
   payload = frame[0:-1]
   checksum = frame[-1:]
   if calcChecksum(payload) == checksum:
     return payload[1:]
+  logging.warning("Frame invalid")
   return False
 
 
