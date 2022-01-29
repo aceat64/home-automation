@@ -149,28 +149,36 @@ def setup(client, config):
   return True
 
 
+def on_connect(client, userdata, flags, rc):
+  logging.info(f"Connected to MQTT broker, rc: {rc}")
+
+
+def on_disconnect(client, userdata, rc):
+  logging.warning(f"Disconnected from MQTT broker, rc: {rc}")
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description="Reads from a JBD BMS and sends the data to Home Assistant.")
   parser.add_argument(
     '-p', '--port',
     default=os.getenv('PORT', '/dev/ttyUSB0'),
-    help='Serial port to use')
+    help="Serial port to use")
   parser.add_argument(
     '-c', '--config',
     default=os.getenv('CONFIG', os.path.join(sys.path[0], 'config.yml')),
-    help='Sensor configuration file')
+    help="Sensor configuration file")
   parser.add_argument(
     '-i', '--interval',
     default=int(os.getenv('INTERVAL', 10)),
-    help='Update interval')
+    help="Update interval")
   parser.add_argument(
     '-t', '--timeout',
     default=int(os.getenv('TIMEOUT', 2)),
-    help='Serial read timeout')
+    help="Serial read timeout")
   parser.add_argument(
     '-v', '--verbose',
-    help='Verbose logging',
+    help="Verbose logging",
     action='store_true'
   )
   args = parser.parse_args()
@@ -190,7 +198,6 @@ if __name__ == '__main__':
   logging.info(f"Using port: {args.port}")
   port = serial.Serial(args.port, timeout = args.timeout)
 
-  logging.info("Connecting to MQTT broker")
   client = mqtt.Client()
   # Use TLS, but wrong
   client.tls_set(cert_reqs=ssl.CERT_NONE)
@@ -198,6 +205,9 @@ if __name__ == '__main__':
   client.will_set(f"homeassistant/sensor/{config['pack']['name']}/status", 'offline', 0, True)
   client.username_pw_set(os.getenv('MQTT_USER'), os.getenv('MQTT_PASS'))
   client.connect(os.getenv('MQTT_SERVER'), int(os.getenv('MQTT_PORT', 8883)))
+  client.on_connect = on_connect
+  client.on_disconnect = on_disconnect
+  client.loop_start()
 
   setup(client, config)
 
@@ -207,21 +217,22 @@ if __name__ == '__main__':
     while True:
       info = getInfo(port)
       if info:
+        logging.debug(f"Got info: {info}")
         if not read_success:
           logging.info("Successful read from BMS")
           read_success = True
-          if client.publish(f"homeassistant/sensor/{config['pack']['name']}/status", 'online', 0, False):
-            logging.info("Updated device status to 'online'")
-        logging.debug(f"Got info: {info}")
-        client.publish(f"homeassistant/sensor/{config['pack']['name']}/state",
-        json.dumps(info), 0, False)
+
+        client.publish(f"homeassistant/sensor/{config['pack']['name']}/status", 'online', 0, False)
+        client.publish(f"homeassistant/sensor/{config['pack']['name']}/state", json.dumps(info), 0, False)
+        
         count += 1
         if (count % 10 == 0):
           logging.info(f"Sent {count} updates")
       else:
-        logging.warning('Failed to read from BMS')
+        logging.warning("Failed to read from BMS")
         read_success = False
-      logging.debug("Sleeping {args.interval}s")
+
+      logging.debug(f"Sleeping {args.interval}s")
       time.sleep(args.interval)
   except KeyboardInterrupt:
     sys.exit(0)
