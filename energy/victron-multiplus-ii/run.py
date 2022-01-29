@@ -60,6 +60,8 @@ def getRamVar(id):
     return False
   port.write(buildFrame('W', f'\x30{id}'))
   res = readFrame()
+  if not res:
+    return False
   raw_value = unpack(info['read_format'], res[3:5])[0]
   if abs(info['offset']) == 0x8000:
     # this is a single bit value
@@ -71,6 +73,8 @@ def getRamVar(id):
 
 def calcValue(id, value):
   info = getRamVarInfo(id)
+  if not info:
+    return False
   return info['scale'] * (value + info['offset'])
 
 
@@ -177,6 +181,8 @@ def getInfo(port):
   ]
   port.write(buildFrame('W', f'\x0e\x00'))
   res = readFrame()
+  if not res:
+    return False
   state, sub_state = unpack('>BB', res[3:5])
   if state == 9:
     info['ac']['state'] = sub_state_defs[sub_state]
