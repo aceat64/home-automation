@@ -1,0 +1,895 @@
+title: Tùs Nuadh
+views:
+  - badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - show_current: true
+            show_forecast: true
+            entity: weather.tus_nuadh
+            type: weather-forecast
+            secondary_info_attribute: humidity
+          - show_current: true
+            show_forecast: true
+            type: weather-forecast
+            entity: weather.woodland_park
+            secondary_info_attribute: humidity
+          - type: thermostat
+            entity: climate.hallway
+            name: " "
+      - type: vertical-stack
+        cards:
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - entity: sensor.airthings_wave_168857_temperature
+                name: Office
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_3
+                name: Bedroom
+              - entity: sensor.hallway_temperature
+                name: Hallway
+              - entity: sensor.living_room_temperature
+                name: Living Room
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature
+                name: Kitchen
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_4
+                name: Bathroom
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_5
+                name: Studio
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_2
+                name: Laundry
+            stat_types:
+              - mean
+            title: Temperature
+            hide_legend: true
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - entity: sensor.airthings_wave_168857_humidity
+                name: Office
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_3
+                name: Bedroom
+              - entity: sensor.hallway_humidity
+                name: Hallway
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_2
+                name: Living Room
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity
+                name: Kitchen
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_4
+                name: Bathroom
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_5
+                name: Studio
+            stat_types:
+              - mean
+            title: Humidity
+            hide_legend: true
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - entity: sensor.living_room_carbon_dioxide
+                name: Living Room
+              - entity: sensor.airthings_wave_168857_co2
+                name: Office
+            stat_types:
+              - mean
+              - max
+              - min
+            title: Carbon Dioxide
+            hide_legend: true
+      - type: vertical-stack
+        cards:
+          - hours_to_show: 24
+            graph: line
+            type: sensor
+            detail: 2
+            entity: sensor.mainsconsumption
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - type: gauge
+                entity: sensor.pack_percent_remaining
+                min: 0
+                max: 100
+                name: " "
+                needle: true
+                segments:
+                  - from: 0
+                    color: "#db4437"
+                  - from: 40
+                    color: "#ffa600"
+                  - from: 60
+                    color: "#358ccb"
+                  - from: 80
+                    color: "#43a047"
+              - type: gauge
+                entity: sensor.avg_pack_temperature
+                segments:
+                  - from: 0
+                    color: "#db4437"
+                  - from: 35
+                    color: "#ffa600"
+                  - from: 45
+                    color: "#43a047"
+                  - from: 115
+                    color: "#ffa600"
+                  - from: 140
+                    color: "#db4437"
+                min: 1
+                max: 150
+                needle: true
+                name: ""
+          - square: false
+            columns: 2
+            type: grid
+            title: Garage
+            cards:
+              - type: entity
+                entity: sensor.garage_sensor_air_temperature
+                state_color: false
+                name: Temperature
+              - type: entity
+                entity: sensor.garage_sensor_humidity
+                name: Humidity
+          - show_name: false
+            show_icon: true
+            show_state: true
+            type: glance
+            entities:
+              - entity: sensor.hecate_range
+              - entity: sensor.hecate_battery
+              - entity: binary_sensor.hecate_charger
+              - entity: binary_sensor.hecate_charging
+            title: Hecate
+            state_color: false
+            columns: 4
+    path: default_view
+    title: Home
+  - badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: grid
+            title: Living Room
+            cards:
+              - type: light
+                entity: light.entry_light
+                name: Entry
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: fan.living_room_fan
+                name: Fan
+              - type: light
+                entity: light.living_room_outlet
+                name: String Lights
+              - type: light
+                entity: light.bookshelf_orb
+                name: The Orb
+                double_tap_action:
+                  action: more-info
+              - type: light
+                entity: light.dining_room_light
+                name: Dining Room
+          - type: grid
+            cards:
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: fan.office_fan
+                show_state: false
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: fan.studio_fan
+              - type: light
+                entity: light.hall_light
+                name: Hallway
+              - type: light
+                entity: light.hall_bath_light
+                name: Bathroom
+              - type: light
+                entity: light.hall_bath_mirror
+                name: Bath Mirror
+      - square: true
+        columns: 3
+        type: grid
+        title: Bedroom
+        cards:
+          - type: light
+            entity: light.master_bed_light
+            name: Bed
+          - show_name: true
+            show_icon: true
+            type: button
+            tap_action:
+              action: toggle
+            entity: fan.master_bed_fan
+            name: Fan
+          - type: light
+            entity: light.reading
+            double_tap_action:
+              action: navigate
+              navigation_path: /lovelace/reading-light
+          - type: light
+            entity: light.master_bath_light
+            name: Bath
+          - type: light
+            entity: light.master_bath_mirrors
+            name: Mirrors
+          - type: light
+            entity: light.master_closet_light
+            name: Closet
+          - show_name: true
+            show_icon: true
+            type: button
+            tap_action:
+              action: toggle
+            entity: fan.master_bath_fan
+            name: Bath Fan
+      - square: true
+        columns: 3
+        type: grid
+        title: Kitchen
+        cards:
+          - type: light
+            entity: light.kitchen_light
+            name: Overhead
+          - type: light
+            entity: light.breakfast_light
+            name: Breakfast
+          - type: light
+            entity: light.kitchen_counter_light
+            name: Counter
+      - square: true
+        columns: 3
+        type: grid
+        title: Outside
+        cards:
+          - type: light
+            entity: light.porch_light
+            name: Porch
+          - type: light
+            entity: light.back_yard_flood
+            name: Back Yard
+          - type: light
+            entity: light.garage_light
+            name: Garage
+    path: rooms
+    title: Rooms
+  - badges: []
+    cards:
+      - type: custom:auto-entities
+        card:
+          type: entities
+          show_header_toggle: false
+          title: Active Alarms
+          state_color: false
+        filter:
+          include:
+            - attributes:
+                device_class: gas
+              state: "on"
+            - attributes:
+                device_class: smoke
+              state: "on"
+            - attributes:
+                device_class: moisture
+              state: "on"
+        show_empty: false
+        sort:
+          method: state
+          reverse: false
+          numeric: false
+      - type: vertical-stack
+        cards:
+          - show_state: false
+            show_name: false
+            camera_view: auto
+            type: picture-entity
+            entity: camera.doorbell_high_3
+            hold_action:
+              action: call-service
+              service: light.toggle
+              data: {}
+              target:
+                entity_id: light.porch_light
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - show_state: false
+                show_name: false
+                camera_view: auto
+                type: picture-entity
+                entity: camera.front_south_high_2
+              - show_state: false
+                show_name: false
+                camera_view: auto
+                type: picture-entity
+                entity: camera.front_north_high_2
+              - show_state: false
+                show_name: false
+                camera_view: auto
+                type: picture-entity
+                entity: camera.backyard_high_2
+                hold_action:
+                  action: call-service
+                  service: light.toggle
+                  data: {}
+                  target:
+                    entity_id: light.back_yard_flood
+              - show_state: false
+                show_name: false
+                camera_view: auto
+                type: picture-entity
+                entity: camera.garage_high_2
+                hold_action:
+                  action: call-service
+                  service: light.toggle
+                  data: {}
+                  target:
+                    entity_id: light.garage_light
+      - type: vertical-stack
+        cards:
+          - show_state: false
+            show_name: false
+            camera_view: auto
+            type: picture-entity
+            entity: camera.driveway_high_2
+      - type: grid
+        cards:
+          - type: vertical-stack
+            title: Front
+            cards:
+              - show_name: false
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: lock.front_door_lock
+                show_state: true
+                hold_action:
+                  action: more-info
+              - show_name: false
+                show_icon: true
+                type: button
+                tap_action:
+                  action: more-info
+                entity: binary_sensor.front_door_access_control_window_door_is_open
+                show_state: true
+          - type: vertical-stack
+            title: Back
+            cards:
+              - show_name: false
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: lock.back_door_lock
+                show_state: true
+                hold_action:
+                  action: more-info
+              - show_name: false
+                show_icon: true
+                type: button
+                tap_action:
+                  action: more-info
+                entity: binary_sensor.back_door_access_control_window_door_is_open
+                show_state: true
+          - type: vertical-stack
+            title: Kitchen
+            cards:
+              - show_name: false
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: lock.kitchen_door_lock
+                show_state: true
+                hold_action:
+                  action: more-info
+              - show_name: false
+                show_icon: true
+                type: button
+                tap_action:
+                  action: more-info
+                entity: binary_sensor.kitchen_door_access_control_window_door_is_open
+                show_state: true
+              - show_name: false
+                show_icon: true
+                type: button
+                entity: binary_sensor.catio_window_is_open
+                show_state: true
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: none
+      - features:
+          - type: cover-open-close
+        type: tile
+        entity: cover.tus_nuadh
+        show_entity_picture: false
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - person.andrew
+              - person.nicole
+            state_color: true
+          - type: entities
+            entities:
+              - entity: device_tracker.hecate_location_tracker
+              - entity: device_tracker.hecate_ibeacon
+              - entity: device_tracker.pixel_6_pro
+              - entity: device_tracker.pixel_5
+              - entity: device_tracker.andrews_macbook_pro
+            show_header_toggle: false
+            state_color: true
+    path: security
+    title: Sec
+  - title: Electrical
+    path: electrical
+    badges: []
+    cards:
+      - type: vertical-stack
+        title: Critical Loads Pack
+        cards:
+          - type: entity-filter
+            entities:
+              - binary_sensor.cell_overvoltage
+              - binary_sensor.cell_undervoltage
+              - binary_sensor.charge_over_current
+              - binary_sensor.charge_over_temperature
+              - binary_sensor.charge_under_temperature
+              - binary_sensor.discharge_over_current
+              - binary_sensor.discharge_over_temperature
+              - binary_sensor.discharge_under_temperature
+              - binary_sensor.frontend_ic_error
+              - binary_sensor.pack_overvoltage
+              - binary_sensor.pack_undervoltage
+              - binary_sensor.short_circuit
+            state_filter:
+              - "on"
+            card:
+              type: entities
+              title: Active Alarms
+            show_empty: false
+          - square: false
+            columns: 3
+            type: grid
+            cards:
+              - type: gauge
+                entity: sensor.pack_percent_remaining
+                min: 0
+                max: 100
+                name: " "
+                needle: true
+                segments:
+                  - from: 0
+                    color: "#db4437"
+                  - from: 40
+                    color: "#ffa600"
+                  - from: 60
+                    color: "#358ccb"
+                  - from: 80
+                    color: "#43a047"
+              - type: gauge
+                entity: sensor.pack_current
+                max: 75
+                segments:
+                  - from: -75
+                    color: "#db4437"
+                  - from: -50
+                    color: "#ffa600"
+                  - from: -25
+                    color: "#358ccb"
+                  - from: 0
+                    color: "#43a047"
+                name: " "
+                min: -75
+                needle: true
+              - type: gauge
+                entity: sensor.avg_pack_temperature
+                segments:
+                  - from: 0
+                    color: "#db4437"
+                  - from: 35
+                    color: "#ffa600"
+                  - from: 45
+                    color: "#43a047"
+                  - from: 115
+                    color: "#ffa600"
+                  - from: 140
+                    color: "#db4437"
+                min: 1
+                max: 150
+                needle: true
+                name: ""
+          - type: entities
+            entities:
+              - entity: sensor.pack_capacity_remaining
+              - entity: sensor.pack_capacity_total
+              - entity: sensor.pack_cycle_count
+              - entity: binary_sensor.charge_enabled
+              - entity: binary_sensor.discharge_enabled
+            state_color: true
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - hours_to_show: 24
+                graph: line
+                type: sensor
+                entity: sensor.pack_voltage
+                detail: 2
+              - hours_to_show: 24
+                graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.avg_pack_temperature
+      - type: vertical-stack
+        title: Critical Loads Inverter
+        cards:
+          - type: entity
+            entity: sensor.inverter_state
+            icon: mdi:information-outline
+          - type: entities
+            entities:
+              - entity: sensor.battery_voltage
+              - entity: sensor.charger_dc_current
+              - entity: sensor.inverter_current
+              - entity: sensor.inverter_dc_current
+              - entity: sensor.inverter_frequency
+              - entity: sensor.inverter_voltage
+              - entity: sensor.mains_current
+              - entity: sensor.mains_frequency
+              - entity: sensor.mains_voltage
+      - type: vertical-stack
+        title: Current Usage
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.mainsconsumption
+              - entity: sensor.main_1
+              - entity: sensor.main_2
+          - type: entities
+            entities:
+              - entity: sensor.dryer
+              - entity: sensor.hvac
+              - entity: sensor.tesla
+              - entity: sensor.inverter_1
+              - entity: sensor.lighting
+              - entity: sensor.office
+              - entity: sensor.studio
+              - entity: sensor.clothes
+              - entity: sensor.growlights
+              - entity: sensor.living_room
+  - theme: Backend-selected
+    title: Hobbies
+    path: hobbies
+    badges: []
+    cards:
+      - type: entity
+        entity: sun.sun
+        state_color: true
+      - type: entities
+        entities:
+          - entity: light.grow_lights
+          - entity: automation.turn_on_growlights_at_sunrise
+            secondary_info: last-triggered
+          - entity: automation.turn_off_growlights_at_sunset
+            secondary_info: last-triggered
+        title: Kitchen
+        show_header_toggle: false
+        state_color: true
+      - type: entities
+        entities:
+          - switch.rotary_tumbler
+          - input_datetime.tumbler_timer
+        state_color: true
+  - theme: Backend-selected
+    title: Env
+    path: env
+    icon: ""
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - chart_type: line
+            period: hour
+            days_to_show: 7
+            type: statistics-graph
+            entities:
+              - entity: sensor.airthings_wave_168857_temperature
+                name: Office
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_3
+                name: Bedroom
+              - entity: sensor.hallway_temperature
+                name: Hallway
+              - entity: sensor.living_room_temperature
+                name: Living Room
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature
+                name: Kitchen
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_4
+                name: Bathroom
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_5
+                name: Studio
+              - entity: >-
+                  sensor.aerq_temperature_and_humidity_sensor_v2_0_air_temperature_2
+                name: Laundry
+            stat_types:
+              - mean
+            title: Temperature
+            hide_legend: true
+          - chart_type: line
+            period: hour
+            days_to_show: 7
+            type: statistics-graph
+            entities:
+              - entity: sensor.airthings_wave_168857_humidity
+                name: Office
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_3
+                name: Bedroom
+              - entity: sensor.hallway_humidity
+                name: Hallway
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_2
+                name: Living Room
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity
+                name: Kitchen
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_4
+                name: Bathroom
+              - entity: sensor.aerq_temperature_and_humidity_sensor_v2_0_humidity_5
+                name: Studio
+            stat_types:
+              - mean
+              - max
+            title: Humidity
+            hide_legend: true
+          - chart_type: line
+            period: hour
+            days_to_show: 7
+            type: statistics-graph
+            entities:
+              - entity: sensor.living_room_pressure
+                name: Living Room
+              - entity: sensor.airthings_wave_168857_pressure
+                name: Office
+            stat_types:
+              - mean
+              - min
+              - max
+            title: Pressure
+            hide_legend: true
+      - type: vertical-stack
+        cards:
+          - chart_type: line
+            period: hour
+            days_to_show: 7
+            type: statistics-graph
+            entities:
+              - entity: sensor.living_room_carbon_dioxide
+                name: Living Room
+              - entity: sensor.airthings_wave_168857_co2
+                name: Office
+            stat_types:
+              - mean
+              - max
+              - min
+            title: Carbon Dioxide
+            hide_legend: true
+          - chart_type: line
+            period: hour
+            days_to_show: 7
+            type: statistics-graph
+            entities:
+              - entity: sensor.kitchen_air_purifier_pm2_5
+                name: Kitchen
+              - entity: sensor.office_air_purifier_pm2_5
+                name: Office
+            stat_types:
+              - mean
+              - max
+            title: PM 2.5
+            hide_legend: true
+          - type: entities
+            entities:
+              - entity: sensor.airthings_wave_168857_radon_1_day_average
+                name: Radon 1-day average
+              - entity: sensor.airthings_wave_168857_radon_1_day_level
+                name: Radon 1-day level
+              - entity: sensor.airthings_wave_168857_radon_longterm_average
+                name: Radon longterm average
+              - entity: sensor.airthings_wave_168857_radon_longterm_level
+                name: Radon longterm level
+            title: Radon
+            show_header_toggle: false
+            state_color: true
+      - type: entities
+        entities:
+          - entity: fan.kitchen_air_purifier
+          - entity: fan.office_air_purifier
+          - entity: sensor.kitchen_air_purifier_filter_life
+          - entity: sensor.office_air_purifier_filter_life
+        title: Air Purifiers
+        state_color: true
+  - title: Print
+    path: prnt
+    badges: []
+    cards:
+      - entities:
+          - entity: sensor.hp_color_laserjet_pro_m478f_9f
+          - entity: sensor.hp_color_laserjet_pro_m478f_9f_uptime
+          - entity: sensor.hp_color_laserjet_pro_m478f_9f_yellow_cartridge
+          - entity: sensor.hp_color_laserjet_pro_m478f_9f_magenta_cartridge
+          - entity: sensor.hp_color_laserjet_pro_m478f_9f_cyan_cartridge
+          - entity: sensor.hp_color_laserjet_pro_m478f_9f_black_cartridge
+        title: Laser Printer
+        type: entities
+        state_color: true
+      - type: custom:threedy-card
+        base_entity: sensor.octoprint
+        printer_type: I3
+        name: Ender 5
+        round_temperature: false
+        round_time: false
+        temperature_unit: F
+        use_24hr: true
+        camera_entity: camera.octoprint_ender_5
+        power_entity: switch.ender_5
+        monitored:
+          - Status
+          - Hotend
+          - Bed
+  - badges: []
+    cards:
+      - type: vertical-stack
+        title: Cleaning
+        cards:
+          - type: entities
+            entities:
+              - entity: vacuum.roomba
+              - entity: binary_sensor.roomba_bin_full
+              - entity: sensor.roomba_battery_level
+            state_color: true
+          - type: entities
+            entities:
+              - entity: vacuum.braava_jet
+              - entity: sensor.braava_jet_battery_level
+            state_color: true
+      - type: vertical-stack
+        title: Home Assistant
+        cards:
+          - entities:
+              - entity: sensor.disk_free
+              - entity: sensor.last_boot
+              - entity: sensor.memory_free
+              - entity: sensor.processor_use
+              - entity: binary_sensor.updater
+              - entity: sensor.hacs
+            show_header_toggle: false
+            type: entities
+            state_color: true
+          - type: entities
+            entities:
+              - entity: automation.turn_on_garage_light_when_the_door_opens
+              - entity: automation.turn_off_garage_lights_when_door_is_locked
+              - entity: automation.disarm_and_unlock_kitchen_door_when_hecate_arrives
+            show_header_toggle: false
+            state_color: true
+    path: serv
+    title: Serv
+  - title: Z-Wave
+    path: zwave
+    badges: []
+    cards:
+      - type: custom:auto-entities
+        card:
+          type: entities
+          show_header_toggle: false
+          title: Z-Wave Battery Levels
+          state_color: true
+        filter:
+          include:
+            - attributes:
+                device_class: battery
+                state_class: measurement
+              integration: zwave_js
+        show_empty: true
+        sort:
+          method: state
+          reverse: false
+          numeric: true
+      - type: custom:auto-entities
+        card:
+          type: entities
+          show_header_toggle: false
+          title: Z-Wave Problems
+          state_color: true
+        filter:
+          include:
+            - attributes:
+                device_class: problem
+              integration: zwave_js
+        show_empty: true
+        sort:
+          method: state
+          reverse: true
+          numeric: false
+      - type: custom:auto-entities
+        card:
+          type: entities
+          show_header_toggle: false
+          title: Z-Wave Alarms
+          state_color: true
+        filter:
+          include:
+            - name: "*alarm"
+              integration: zwave_js
+        show_empty: true
+        sort:
+          method: state
+          reverse: false
+          numeric: false
+  - theme: Backend-selected
+    subview: true
+    title: Reading Light
+    path: reading-light
+    icon: mdi:lamps
+    badges: []
+    cards:
+      - show_name: true
+        show_icon: true
+        type: button
+        tap_action:
+          action: more-info
+        entity: light.light_2
+        hold_action:
+          action: toggle
+      - show_name: true
+        show_icon: true
+        type: button
+        tap_action:
+          action: more-info
+        entity: light.light_3
+        hold_action:
+          action: toggle
+      - show_name: true
+        show_icon: true
+        type: button
+        tap_action:
+          action: more-info
+        entity: light.light_1
+        hold_action:
+          action: toggle
+  - title: Entertainment
+    path: entertainment
+    icon: mdi:youtube-tv
+    badges: []
+    cards:
+      - type: media-control
+        entity: media_player.living_room_tv
+      - type: entities
+        entities:
+          - remote.living_room_tv

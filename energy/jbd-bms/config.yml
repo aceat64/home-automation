@@ -40,6 +40,7 @@ sensor:
     device_class: temperature
     unit_of_measurement: "°C"
     value_template: "{{ value_json.ntc2 }}"
+
   - name: Cell 0 Voltage
     device_class: voltage
     unit_of_measurement: V
@@ -201,73 +202,119 @@ sensor:
     device_class: running
     value_template: "{% if value_json.bal15 == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
+
   - name: Cell Overvoltage
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.covp_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Cell Undervoltage
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.cuvp_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Pack Overvoltage
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.povp_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Pack Undervoltage
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.puvp_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Charge Over Temperature
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.chgot_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Charge Under Temperature
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.chgut_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Discharge Over Temperature
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.dsgot_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Discharge Under Temperature
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.dsgut_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Charge Over Current
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.chgoc_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Discharge Over Current
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.dsgoc_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Short Circuit
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.sc_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Frontend IC Error
     binary_sensor: true
     device_class: safety
     value_template: "{% if value_json.afe_err == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Charge Enabled
     binary_sensor: true
     device_class: power
     value_template: "{% if value_json.chg_fet_en == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
   - name: Discharge Enabled
     binary_sensor: true
     device_class: power
     value_template: "{% if value_json.dsg_fet_en == True %} ON {% else %} OFF {% endif %}"
-    entity_category: config
+    entity_category: diagnostic
+
+  - name: Short Circuit Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.sc_err_cnt }}"
+    entity_category: diagnostic
+  - name: Charge Over Current Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.chgoc_err_cnt }}"
+    entity_category: diagnostic
+  - name: Discharge Over Current Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.dsgoc_err_cnt }}"
+    entity_category: diagnostic
+  - name: Cell Overvoltage Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.covp_err_cnt }}"
+    entity_category: diagnostic
+  - name: Cell Undervoltage Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.cuvp_err_cnt }}"
+    entity_category: diagnostic
+  - name: Charge Over Temperature Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.chgot_err_cnt }}"
+    entity_category: diagnostic
+  - name: Charge Under Temperature Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.chgut_err_cnt }}"
+    entity_category: diagnostic
+  - name: Discharge Over Temperature Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.dsgot_err_cnt }}"
+    entity_category: diagnostic
+  - name: Discharge Under Temperature Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.dsgut_err_cnt }}"
+    entity_category: diagnostic
+  - name: Pack Overvoltage Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.povp_err_cnt }}"
+    entity_category: diagnostic
+  - name: Pack Undervoltage Error Count
+    icon: mdi:counter
+    value_template: "{{ value_json.povp_err_cnt }}"
+    entity_category: diagnostic

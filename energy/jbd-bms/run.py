@@ -12,12 +12,15 @@ from struct import *
 
 
 def buildFrame(address, data=[]):
-    payload = [ord(address), len(data)] + data
+    payload = [ord(address), len(data)] + list(data)
     checksum = calcChecksum(payload)
-    return bytes(b"\xdd\xa5" + bytes(payload) + checksum + b"\x77")
+    frame = bytes(b"\xdd\xa5" + bytes(payload) + checksum + b"\x77")
+    logging.debug(f"Built frame: {frame}")
+    return frame
 
 
 def readFrame():
+    logging.debug("Reading frame")
     frame = port.read_until("\x77")
     if not frame:
         return False
@@ -29,6 +32,7 @@ def readFrame():
     if calcChecksum(payload) != checksum:
         logging.debug("Invalid checksum")
         return False
+    logging.debug(f"Got frame: {frame}")
     return payload
 
 
@@ -119,7 +123,46 @@ def getInfo(port):
             i + 1
         ]  # Up by 1 because the first entry is the status byte
 
+    error_counts = getErrors(port)
+    if error_counts:
+        info |= error_counts
+
     return info
+
+
+def getErrors(port):
+    # Send command to "enter factory mode" so that we can access additional registers
+    port.write(buildFrame(b"\x00", [ord(b"\x56"), ord(b"\x78")]))
+    
+    # Get error counts
+    port.write(buildFrame(b"\xAA"))
+    frame = readFrame()
+    if not frame:
+        logging.debug("Not a valid frame")
+        return False
+    
+    # Exit "factory mode" without resetting error counts
+    # port.write(buildFrame(b"\x01\x00\x00"))
+
+    values = unpack(">BxHHHHHHHHHHH", frame[0:24])
+    if values[0] != 0:
+        # status is not ok!
+        logging.debug("Frame status not ok")
+        return False
+
+    return {
+        "sc_err_cnt": values[1],
+        "chgoc_err_cnt": values[2],
+        "dsgoc_err_cnt": values[3],
+        "covp_err_cnt": values[4],
+        "cuvp_err_cnt": values[5],
+        "chgot_err_cnt": values[6],
+        "chgut_err_cnt": values[7],
+        "dsgot_err_cnt": values[8],
+        "dsgut_err_cnt": values[9],
+        "povp_err_cnt": values[10],
+        "puvp_err_cnt": values[11]
+    }
 
 
 def setup(client, config):
