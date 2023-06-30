@@ -3,21 +3,25 @@ pack:
 sensor:
   - name: Pack Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     icon: mdi:current-dc
     value_template: "{{ (value_json.pack_mv / 100) | round(2) }}"
   - name: Pack Current
     device_class: current
+    state_class: measurement
     unit_of_measurement: A
     icon: mdi:current-dc
     value_template: "{{ (value_json.pack_ma / 100) | round(2) }}"
   - name: Pack Capacity Remaining
-    device_class: energy
+    device_class: energy_storage
+    state_class: measurement
     unit_of_measurement: Wh
     icon: mdi:battery-high
     value_template: "{{ ((value_json.cur_cap / 100) * 51.2) | round(0) }}"
   - name: Pack Capacity Total
-    device_class: energy
+    device_class: energy_storage
+    state_class: measurement
     unit_of_measurement: Wh
     icon: mdi:battery
     value_template: "{{ ((value_json.full_cap / 100) * 51.2) | round(0) }}"
@@ -26,98 +30,123 @@ sensor:
     value_template: "{{ value_json.cycle_cnt }}"
   - name: Pack Percent Remaining
     device_class: battery
+    state_class: measurement
     unit_of_measurement: "%"
     value_template: "{{ value_json.cap_pct }}"
   - name: Pack Temperature 0
     device_class: temperature
+    state_class: measurement
     unit_of_measurement: "°C"
     value_template: "{{ value_json.ntc0 }}"
   - name: Pack Temperature 1
     device_class: temperature
+    state_class: measurement
     unit_of_measurement: "°C"
     value_template: "{{ value_json.ntc1 }}"
   - name: Pack Temperature 2
     device_class: temperature
+    state_class: measurement
     unit_of_measurement: "°C"
     value_template: "{{ value_json.ntc2 }}"
+  - name: Avg Pack Temperature
+    device_class: temperature
+    state_class: measurement
+    unit_of_measurement: "°C"
+    value_template: "{{ average([value_json.ntc0, value_json.ntc1, value_json.ntc2]) | round(1) }}"
 
   - name: Cell 0 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell0_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 1 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell1_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 2 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell2_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 3 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell3_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 4 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell4_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 5 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell5_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 6 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell6_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 7 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell7_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 8 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell8_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 9 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell9_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 10 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell10_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 11 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell11_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 12 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell12_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 13 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell13_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 14 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell14_mv / 1000 }}"
     entity_category: diagnostic
   - name: Cell 15 Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.cell15_mv / 1000 }}"
     entity_category: diagnostic
@@ -205,72 +234,72 @@ sensor:
 
   - name: Cell Overvoltage
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.covp_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Cell Undervoltage
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.cuvp_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Pack Overvoltage
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.povp_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Pack Undervoltage
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.puvp_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Charge Over Temperature
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.chgot_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Charge Under Temperature
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.chgut_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Discharge Over Temperature
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.dsgot_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Discharge Under Temperature
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.dsgut_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Charge Over Current
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.chgoc_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Discharge Over Current
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.dsgoc_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Short Circuit
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.sc_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Frontend IC Error
     binary_sensor: true
-    device_class: safety
+    device_class: problem
     value_template: "{% if value_json.afe_err == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Charge Enabled
     binary_sensor: true
-    device_class: power
+    device_class: running
     value_template: "{% if value_json.chg_fet_en == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
   - name: Discharge Enabled
     binary_sensor: true
-    device_class: power
+    device_class: running
     value_template: "{% if value_json.dsg_fet_en == True %} ON {% else %} OFF {% endif %}"
     entity_category: diagnostic
 

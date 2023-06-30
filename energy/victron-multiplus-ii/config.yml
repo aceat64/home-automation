@@ -3,42 +3,72 @@ inverter:
 sensor:
   - name: Battery Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     icon: mdi:current-dc
     value_template: "{{ value_json.dc.voltage }}"
   - name: Inverter DC Current
     device_class: current
+    state_class: measurement
     unit_of_measurement: A
     icon: mdi:current-dc
     value_template: "{{ value_json.dc.current_used }}"
   - name: Charger DC Current
     device_class: current
+    state_class: measurement
     unit_of_measurement: A
     icon: mdi:current-dc
     value_template: "{{ value_json.dc.current_charge }}"
   - name: Inverter Frequency
     device_class: frequency
+    state_class: measurement
     unit_of_measurement: Hz
     value_template: "{{ value_json.dc.inverter_freq }}"
   - name: Inverter State
+    device_class: enum
+    options:
+      - "Down"
+      - "Startup"
+      - "Off"
+      - "Slave"
+      - "Inverting"
+      - "Inverter Half"
+      - "Inverting AES"
+      - "Power Assist"
+      - "Bypass"
+      - "Charge"
+      - "Charge Init"
+      - "Charge Bulk"
+      - "Charge Absorption"
+      - "Charge Float"
+      - "Charge Storage"
+      - "Charge Repeated Absorption"
+      - "Charge Forced Absorption"
+      - "Charge Equalize"
+      - "Charge Bulk Stopped"
     value_template: "{{ value_json.ac.state }}"
   - name: Mains Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.ac.mains_voltage }}"
   - name: Mains Current
     device_class: current
+    state_class: measurement
     unit_of_measurement: A
     value_template: "{{ value_json.ac.mains_current }}"
   - name: Inverter Voltage
     device_class: voltage
+    state_class: measurement
     unit_of_measurement: V
     value_template: "{{ value_json.ac.inverter_voltage }}"
   - name: Inverter Current
     device_class: current
+    state_class: measurement
     unit_of_measurement: A
     value_template: "{{ value_json.ac.inverter_current }}"
   - name: Mains Frequency
     device_class: frequency
+    state_class: measurement
     unit_of_measurement: Hz
     value_template: "{{ value_json.ac.mains_freq }}"
