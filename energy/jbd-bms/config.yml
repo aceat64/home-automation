@@ -37,17 +37,17 @@ sensor:
     device_class: temperature
     state_class: measurement
     unit_of_measurement: "°C"
-    value_template: "{{ value_json.ntc0 }}"
+    value_template: "{{ value_json.ntc0 | round(1) }}"
   - name: Pack Temperature 1
     device_class: temperature
     state_class: measurement
     unit_of_measurement: "°C"
-    value_template: "{{ value_json.ntc1 }}"
+    value_template: "{{ value_json.ntc1 | round(1) }}"
   - name: Pack Temperature 2
     device_class: temperature
     state_class: measurement
     unit_of_measurement: "°C"
-    value_template: "{{ value_json.ntc2 }}"
+    value_template: "{{ value_json.ntc2 | round(1) }}"
   - name: Avg Pack Temperature
     device_class: temperature
     state_class: measurement
