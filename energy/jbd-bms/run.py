@@ -124,8 +124,11 @@ def getInfo(port):
         ]  # Up by 1 because the first entry is the status byte
 
     error_counts = getErrors(port)
-    if error_counts:
-        info |= error_counts
+    if not error_counts:
+        logging.debug("Unable to get error counts")
+        return False
+
+    info |= error_counts
 
     return info
 
