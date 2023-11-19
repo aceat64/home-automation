@@ -1,3 +1,22 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":pinDevDependencies"
+  ],
+  "packageRules": [
+    {
+      "description": "Automerge changes that are generally safe.",
+      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
+      "automerge": true,
+      "ignoreTests": true
+    },
+    {
+      "description": "Automerge GitHub action updates.",
+      "matchDepTypes": ["action"],
+      "automerge": true,
+      "ignoreTests": true
+    }
+  ]
 }
