@@ -54,6 +54,13 @@ sensor:
     unit_of_measurement: "°C"
     value_template: "{{ average([value_json.ntc0, value_json.ntc1, value_json.ntc2]) | round(1) }}"
 
+  - name: Cell Voltage Difference
+    device_class: voltage
+    state_class: measurement
+    unit_of_measurement: V
+    value_template: "{{ value_json.cell_diff_mv / 1000 }}"
+    entity_category: diagnostic
+
   - name: Cell 0 Voltage
     device_class: voltage
     state_class: measurement

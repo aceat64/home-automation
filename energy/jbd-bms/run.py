@@ -118,10 +118,12 @@ def getInfo(port):
     if cell_values[0] != 0:
         logging.debug("Frame status not ok")
         return False
-    for i in range(16):
-        info[f"cell{i}_mv"] = cell_values[
-            i + 1
-        ]  # Up by 1 because the first entry is the status byte
+    # Get rid of the status byte
+    cell_values = cell_values[1:]
+
+    for i in range(info["cell_cnt"]):
+        info[f"cell{i}_mv"] = cell_values[i]
+    info["cell_diff_mv"] = max(cell_values) - min(cell_values)
 
     error_counts = getErrors(port)
     if not error_counts:
@@ -136,14 +138,14 @@ def getInfo(port):
 def getErrors(port):
     # Send command to "enter factory mode" so that we can access additional registers
     port.write(buildFrame(b"\x00", [ord(b"\x56"), ord(b"\x78")]))
-    
+
     # Get error counts
     port.write(buildFrame(b"\xAA"))
     frame = readFrame()
     if not frame:
         logging.debug("Not a valid frame")
         return False
-    
+
     # Exit "factory mode" without resetting error counts
     # port.write(buildFrame(b"\x01\x00\x00"))
 
@@ -164,7 +166,7 @@ def getErrors(port):
         "dsgot_err_cnt": values[8],
         "dsgut_err_cnt": values[9],
         "povp_err_cnt": values[10],
-        "puvp_err_cnt": values[11]
+        "puvp_err_cnt": values[11],
     }
 
 
