@@ -16,7 +16,9 @@ def buildFrame(command, data=""):
     frame.extend(map(ord, command))
     frame.extend(map(ord, data))
     frame.insert(0, len(frame))
-    return bytes(frame) + calcChecksum(frame)
+    built_frame = bytes(frame) + calcChecksum(frame)
+    logging.debug("Built frame: %s", built_frame.hex())
+    return built_frame
 
 
 def readFrame():
@@ -27,6 +29,7 @@ def readFrame():
         return False
     payload = frame[0:-1]
     checksum = frame[-1:]
+    logging.debug("Got frame: %s", frame.hex())
     if calcChecksum(payload) == checksum:
         return payload[1:]
     logging.warning("Frame invalid")
@@ -184,10 +187,14 @@ def getInfo(port):
     if not res:
         return False
     state, sub_state = unpack(">BB", res[3:5])
-    if state == 9:
-        info["ac"]["state"] = sub_state_defs[sub_state]
-    else:
-        info["ac"]["state"] = state_defs[state]
+    try:
+        if state == 9:
+            info["ac"]["state"] = sub_state_defs[sub_state]
+        else:
+            info["ac"]["state"] = state_defs[state]
+    except IndexError:
+        logging.error("Unknown state/sub-state: %s %s", state, sub_state)
+        return False
 
     return info
 
