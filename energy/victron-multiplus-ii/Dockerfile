@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.11
+ARG PYTHON_VERSION=3.15
 
 #
 # Stage: prep
